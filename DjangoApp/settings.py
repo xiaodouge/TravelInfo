@@ -30,6 +30,12 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates').replace('\\', '/'),
 )
 
+STATIC_ROOT = ''
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(os.path.dirname(__file__), '../static/').replace('\\','/'),
+)
+
 # Application definition
 
 INSTALLED_APPS = (

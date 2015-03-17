@@ -53,21 +53,22 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="/">首页推荐</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">地点<span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            {% for post in post_list %}
-                            <li><a href="{% url 'countries' sel_country=post.country %}">BirdNote</a></li>
-                            {% endfor %}
-
-                        </ul>
-                    </li>
                     <li><a href="{{ site.baseurl }}tags">Tags</a></li>
-                    <li><a href="http://127.0.0.1:8000/about">关于</a></li>
 
+                    <li><a href="http://127.0.0.1:8000/about">关于</a></li>
                 </ul>
+                <div class="btn-group">
+                    <select class="form-control" id="select">
+                        <option value="volvo">Volvo</option>
+                        {% for country in country_list %}
+                        <option value="{{country.country}}">{{country.country}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-            <!-- /.navbar-collapse -->
+
+        </div>
+        <!-- /.navbar-collapse -->
         </div>
         <!-- /.container-fluid -->
     </nav>

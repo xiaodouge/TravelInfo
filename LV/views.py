@@ -10,18 +10,29 @@ def detail(request, id):
         post = Articles.objects.get(id=str(id));
     except Articles.DoesNotExist:
         raise Http404
-    return render(request,'post.html',{'post':post})
+    return render(request, 'post.html', {'post': post})
 
-def countries(request,sel_country):
+
+def countries(request):
     try:
-        post_list = Articles.objects.get(country=sel_country);
+        #country_list = Articles.objects.values("country").distinct();
+        country_list = Articles.objects.values("country").distinct();
+        country_list.query.group_by = ['country']
     except Articles.DoesNotExist:
         raise Http404
-    return render(request,'countries.html',{'post_list':post_list})
+    return render(request, 'base.html', {'country_list': country_list})
+
 
 def home(request):
     post_list = Articles.objects.all()
-    return render(request,'home.html',{'post_list':post_list})
+    try:
+        #country_list = Articles.objects.values("country").distinct();
+        country_list = Articles.objects.values("country").distinct();
+        country_list.query.group_by = ['country']
+    except Articles.DoesNotExist:
+        raise Http404
+    return render(request, 'home.html', {'post_list': post_list,'country_list': country_list})
+
 
 def about(request):
-    return render(request,'about.html',{'about':about})
+    return render(request, 'about.html', {'about': about})

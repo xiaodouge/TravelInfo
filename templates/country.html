@@ -2,10 +2,6 @@
 
 {% block content %}
 <div class="col-xs-12 col-sm-9">
-
-    {% if error %}
-      <h2 class = "post-title"> 没有相关信息</h2>
-    {% else %}
     {% for post in post_list %}
         <section class="post">
         <!-- Post start -->
@@ -28,21 +24,6 @@
         <!-- Post end -->
         </section>
     {% endfor %}
-    {% endif%}
-
-    {% if post_list.object_list and post_list.paginator.num_pages > 1 %}
-      <div>
-      <ul class="pager">
-      {% if post_list.has_previous %}
-        <li><a href="?page={{ post_list.previous_page_number }}">上一页</a></li>
-      {% endif %}
-
-      {% if post_list.has_next %}
-        <li><a href="?page={{ post_list.next_page_number }}">下一页</a></li>
-      {% endif %}
-      </ul>
-      </div>
-    {% endif %}
 </div><!-- /.blog-post -->
 
 

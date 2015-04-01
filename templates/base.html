@@ -53,18 +53,37 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="/">首页推荐</a></li>
-                    <li><a href="{{ site.baseurl }}tags">Tags</a></li>
-
                     <li><a href="http://127.0.0.1:8000/about">关于</a></li>
+                    <li>
+                        <form action="/search/" method="get">
+                            <div class="btn btn-primary">
+                                <input class="form-control" id="inputDefault" type="text" name="s" placeholder="search">
+                            </div>
+                        </form>
+                    </li>
+
+
                 </ul>
-                <div class="btn-group">
-                    <select class="form-control" id="select">
-                        <option value="volvo">Volvo</option>
-                        {% for country in country_list %}
-                        <option value="{{country.country}}">{{country.country}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+
+                <form action="/country/" id="choosecountry" method="post" target="_blank"
+                      style="display: inline-block;">
+                    <input type="hidden" value="_s-xclick">
+
+                    <div class="btn btn-primary">
+                        <select name="country" title="请选择一个国家。">
+                            {% for country in country_list %}
+                            <option value="{{country.country}}">{{country.country}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="选择国家">
+                    </div>
+
+                </form>
+                <style>
+                    #choosecountry .btn { padding: 5px 30px 6px 30px; }
+                    #choosecountry input { background: transparent; border: 0; }
+                </style>
+
             </div>
 
         </div>

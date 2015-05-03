@@ -33,6 +33,16 @@
     <script src="ttp://127.0.0.1:8000/static//bootstrap.min.js"></script>
     <script src="ttp://127.0.0.1:8000/static//ripples.min.js"></script>
     <script src="ttp://127.0.0.1:8000/static//material.min.js"></script>
+
+   <style type="text/css">
+   <!--
+   a:link { text-decoration: none;color: white}
+   a:active { text-decoration:white}
+   a:hover { text-decoration:underline;color: white} 
+   a:visited { text-decoration: none;color: white}
+   -－> 
+   </style> 
+
 </head>
 
 <header>
@@ -79,12 +89,22 @@
                     </div>
 
                 </form>
+
+{% if login_state %}
+<a href="http://127.0.0.1:8000/addinfo">添加</a>
+<a href="http://127.0.0.1:8000/logout">退出</a>
+{% else %}
+<a href="http://127.0.0.1:8000/login">登录</a>
+<a href="http://127.0.0.1:8000/register">注册</a>
+{% endif%}
                 <style>
                     #choosecountry .btn { padding: 5px 30px 6px 30px; }
                     #choosecountry input { background: transparent; border: 0; }
                 </style>
 
+
             </div>
+
 
         </div>
         <!-- /.navbar-collapse -->

@@ -33,7 +33,13 @@ def register(request):
             user.password = password
             user.save()
             #返回注册成功页面
-            return render_to_response('success.html',{'username':username})
+
+            if user:
+                #比较成功，跳转index
+                response = HttpResponseRedirect('/home/')
+                #将username写入浏览器cookie,失效时间为3600
+                response.set_cookie('username',username,3600)
+                return response
     else:
         uf = UserForm()
     return render_to_response('register.html',{'uf':uf})
@@ -97,7 +103,7 @@ def login(req):
             user = User.objects.filter(username__exact = username,password__exact = password)
             if user:
                 #比较成功，跳转index
-                response = HttpResponseRedirect('/index/')
+                response = HttpResponseRedirect('/home/')
                 #将username写入浏览器cookie,失效时间为3600
                 response.set_cookie('username',username,3600)
                 return response
@@ -109,9 +115,13 @@ def login(req):
     return render_to_response('login.html',{'uf':uf},context_instance=RequestContext(req))
 
 #登陆成功
-def index(req):
-    username = req.COOKIES.get('username','')
-    return render_to_response('index.html' ,{'username':username})
+def index(request):
+    username = request.COOKIES.get('username','')
+    if request.user.is_authenticated:
+        state = '已登录'
+    else:
+        state = '未登录'
+    return render_to_response('index.html' ,{'username':username,'state':state})
 
 #退出
 def logout(req):
@@ -182,14 +192,26 @@ def home(request):
         paginator = Paginator(posts,5)
         page = request.GET.get('page')
         post_list = paginator.page(page)
+        if request.user.is_authenticated:
+            login_state = True
+        else:
+            login_state = False
 
     except Articles.DoesNotExist:
         raise Http404
     except PageNotAnInteger :
         post_list = paginator.page(1)
+        if request.user.is_authenticated:
+            login_state = True
+        else:
+            login_state = False
     except EmptyPage :
         post_list = paginator.paginator(paginator.num_pages)
-    return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list})
+        if request.user.is_authenticated:
+            login_state = True
+        else:
+            login_state = False
+    return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list,'login_state':login_state})
 
 
 """

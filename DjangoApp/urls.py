@@ -11,6 +11,7 @@ urlpatterns = patterns('',
 
                        url(r'^static/(?P<path>.*)', 'django.views.static.serve', {'document_root': 'static/'}),
                        url(r'^$', 'LV.views.home'),
+                       url(r'^home/$', 'LV.views.home'),
                        url(r'^about$', 'LV.views.about'),
                        #url(r'^archives/$', 'LV.views.archives', name = 'archives'),
                        url(r'^upload/(?P<path>.*)', 'django.views.static.serve', {'document_root': 'upload/'}),

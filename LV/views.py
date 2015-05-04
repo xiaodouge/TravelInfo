@@ -38,7 +38,7 @@ def register(request):
                 #比较成功，跳转index
                 response = HttpResponseRedirect('/home/')
                 #将username写入浏览器cookie,失效时间为3600
-                response.set_cookie('username',username,3600)
+                response.set_cookie('username',username,10)
                 return response
     else:
         uf = UserForm()
@@ -85,7 +85,8 @@ def addinfo(request):
             info.content = content
             info.headImg=headImg
             info.save()
-            return render_to_response('success.html')
+            response = HttpResponseRedirect('/home/')
+            return response
     else:
         infoform = ArticlesForm()
     return render_to_response('addinfo.html',{'infoform':infoform})
@@ -105,7 +106,7 @@ def login(req):
                 #比较成功，跳转index
                 response = HttpResponseRedirect('/home/')
                 #将username写入浏览器cookie,失效时间为3600
-                response.set_cookie('username',username,3600)
+                response.set_cookie('username',username,10)
                 return response
             else:
                 #比较失败，还在login
@@ -125,7 +126,7 @@ def index(request):
 
 #退出
 def logout(req):
-    response = HttpResponse('logout !!')
+    response = HttpResponseRedirect('/home/')
     #清理cookie里保存username
     response.delete_cookie('username')
     return response
@@ -186,32 +187,36 @@ def country(request,country):
 
 def home(request):
     try:
+
         posts = Articles.objects.all()
         country_list = Articles.objects.values("country").distinct()
         country_list.query.group_by = ['country']
         paginator = Paginator(posts,5)
         page = request.GET.get('page')
         post_list = paginator.page(page)
-        if request.user.is_authenticated:
+        username = request.COOKIES.get('username','')
+        if username:
             login_state = True
         else:
             login_state = False
-
-    except Articles.DoesNotExist:
+    except Articles.DoesNotExist:        
         raise Http404
     except PageNotAnInteger :
         post_list = paginator.page(1)
-        if request.user.is_authenticated:
+        username = request.COOKIES.get('username','')
+        if username:
             login_state = True
         else:
             login_state = False
     except EmptyPage :
         post_list = paginator.paginator(paginator.num_pages)
-        if request.user.is_authenticated:
+        username = request.COOKIES.get('username','')
+        if username:
             login_state = True
         else:
             login_state = False
-    return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list,'login_state':login_state})
+
+    return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list,'login_state':login_state,'username':username})
 
 
 """

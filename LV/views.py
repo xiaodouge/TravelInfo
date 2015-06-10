@@ -38,7 +38,7 @@ def register(request):
                 #比较成功，跳转index
                 response = HttpResponseRedirect('/home/')
                 #将username写入浏览器cookie,失效时间为3600
-                response.set_cookie('username',username,10)
+                response.set_cookie('username',username,3600)
                 return response
     else:
         uf = UserForm()
@@ -72,6 +72,7 @@ def addinfo(request):
             category = infoform.cleaned_data['category']
             content = infoform.cleaned_data['content']
             headImg = infoform.cleaned_data['headImg']
+            pubuser = request.COOKIES.get('username','')
 
             #将表单写入数据库
             info = Articles()
@@ -84,6 +85,7 @@ def addinfo(request):
             info.category = category
             info.content = content
             info.headImg=headImg
+            info.pubuser=pubuser
             info.save()
             response = HttpResponseRedirect('/home/')
             return response
@@ -106,7 +108,7 @@ def login(req):
                 #比较成功，跳转index
                 response = HttpResponseRedirect('/home/')
                 #将username写入浏览器cookie,失效时间为3600
-                response.set_cookie('username',username,10)
+                response.set_cookie('username',username,3600)
                 return response
             else:
                 #比较失败，还在login
@@ -135,15 +137,26 @@ def address_search(request):
     if 's' in request.GET:
         s = request.GET['s']
         if not s:
+            username = request.COOKIES.get('username','')
+            if username:
+                login_state = True
+            else:
+               login_state = False
             return render(request, 'about.html')
         else:
+            username = request.COOKIES.get('username','')
+            if username:
+                login_state = True
+            else:
+               login_state = False
             post_list = Articles.objects.filter(title__icontains=s);
             country_list = Articles.objects.values("country").distinct()
             country_list.query.group_by = ['country']
+
             if len(post_list) == 0:
-                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': True})
+                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': True,'login_state':login_state,'username':username})
             else:
-                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': False})
+                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': False,'login_state':login_state,'username':username})
 
     return redirect('/')
 
@@ -152,17 +165,63 @@ def choose_country(request):
     if 'country' in request.POST:
         s = request.POST['country']
         if not s:
+            username = request.COOKIES.get('username','')
+            if username:
+              login_state = True
+            else:
+                login_state = False
             return render(request, 'about.html')
+
         else:
+            username = request.COOKIES.get('username','')
+            if username:
+              login_state = True
+            else:
+                login_state = False
             post_list = Articles.objects.filter(country__iexact=s)  # contains
             country_list = Articles.objects.values("country").distinct()
             country_list.query.group_by = ['country']
+
             if len(post_list) == 0:
-                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': True})
+                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': True,'login_state':login_state,'username':username})
             else:
-                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': False})
+                return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list, 'error': False,'login_state':login_state,'username':username})
 
     return redirect('/')
+
+def userhome(request):
+    try:
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
+        posts = Articles.objects.filter(pubuser__iexact=username)
+        country_list = Articles.objects.values("country").distinct()
+        country_list.query.group_by = ['country']
+        paginator = Paginator(posts,5)
+        page = request.GET.get('page')
+        post_list = paginator.page(page)
+
+    except Articles.DoesNotExist:        
+        raise Http404
+    except PageNotAnInteger :
+        post_list = paginator.page(1)
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
+    except EmptyPage :
+        post_list = paginator.paginator(paginator.num_pages)
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
+
+    return render(request, 'home.html', {'post_list': post_list, 'country_list': country_list,'login_state':login_state,'username':username})
+
 
 
 def detail(request, id):
@@ -170,9 +229,21 @@ def detail(request, id):
         post = Articles.objects.get(id=str(id))
         country_list = Articles.objects.values("country").distinct()
         country_list.query.group_by = ['country']
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
     except Articles.DoesNotExist:
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
         raise Http404
-    return render(request, 'post.html', {'post': post, 'country_list': country_list})
+
+
+    return render(request, 'post.html', {'post': post, 'country_list': country_list,'login_state':login_state,'username':username})
 
 
 """
@@ -236,7 +307,17 @@ def about(request):
     try:
         country_list = Articles.objects.values("country").distinct()
         country_list.query.group_by = ['country']
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
     except Articles.DoesNotExist:
+        username = request.COOKIES.get('username','')
+        if username:
+            login_state = True
+        else:
+            login_state = False
         raise Http404
-    return render(request, 'about.html', {'about': about, 'country_list': country_list})
+    return render(request, 'about.html', {'about': about, 'country_list': country_list,'login_state':login_state,'username':username})
 

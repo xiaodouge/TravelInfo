@@ -16,6 +16,7 @@ class Articles(models.Model) :
     date_time = models.DateTimeField('更新时间',auto_now_add = True)  #publishdate
     content = models.TextField('内容',blank = True, null = True)  #content
     headImg = models.FileField('插图',upload_to = 'upload/',blank = True)
+    pubuser = models.CharField('发布者',max_length = 50, default='管理员')
 
     def __unicode__(self) :
         return self.title
